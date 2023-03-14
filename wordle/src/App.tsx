@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Normalize } from 'styled-normalize';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
@@ -32,7 +33,7 @@ const LatticeRow = styled.div`
   gap: 5px;
 `;
 
-const Lattice = styled.div<LatticeProps>`
+const Lattice = styled.input<LatticeProps>`
   width: 62px;
   height: 62px;
   border: 2px solid #d3d6da;
@@ -131,6 +132,8 @@ const data: Data = [
 ];
 
 const App: React.FC = () => {
+  const [value, setValue] = useState<Data>(data);
+
   return (
     <>
       <Normalize />
@@ -141,7 +144,7 @@ const App: React.FC = () => {
           <LatticeRow key={index}>
             {item.map((arr) => (
               <>
-                <Lattice status={arr.status}>{arr.inputValue}</Lattice>
+                <Lattice status={arr.status} value={arr.inputValue} />
               </>
             ))}
           </LatticeRow>
