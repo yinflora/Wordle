@@ -1,5 +1,4 @@
 import { Normalize } from 'styled-normalize';
-// import { createGlobalStyle } from 'styled-components';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
@@ -33,7 +32,7 @@ const LatticeRow = styled.div`
   gap: 5px;
 `;
 
-const Lattice = styled.div<AppProps>`
+const Lattice = styled.div<LatticeProps>`
   width: 62px;
   height: 62px;
   border: 2px solid #d3d6da;
@@ -68,7 +67,7 @@ const Lattice = styled.div<AppProps>`
     `}
 `;
 
-type AppProps = {
+type LatticeProps = {
   isCorrect?: boolean;
   isWrongPosition?: boolean;
   isIncorrect?: boolean;
