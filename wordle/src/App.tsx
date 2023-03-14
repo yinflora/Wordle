@@ -40,40 +40,95 @@ const Lattice = styled.div<LatticeProps>`
   line-height: 62px;
   text-align: center;
   ${(props) =>
-    props.isCorrect &&
+    props.status === 'isCorrect' &&
     css`
       border: none;
       background-color: #6aaa64;
       color: #ffffff;
     `}
   ${(props) =>
-    props.isWrongPosition &&
+    props.status === 'isWrongPosition' &&
     css`
       border: none;
       background-color: #c9b458;
       color: #ffffff;
     `}
   ${(props) =>
-    props.isIncorrect &&
+    props.status === 'isIncorrect' &&
     css`
       border: none;
       background-color: #787c7e;
       color: #ffffff;
     `}
   ${(props) =>
-    props.isTyping &&
+    props.status === 'isTyping' &&
     css`
       border-color: #878a8c;
     `}
 `;
 
-type LatticeProps = {
-  isCorrect?: boolean;
-  isWrongPosition?: boolean;
-  isIncorrect?: boolean;
-  isTyping?: boolean;
-  isBlank?: boolean;
+type StatusValue =
+  | ''
+  | 'isCorrect'
+  | 'isWrongPosition'
+  | 'isIncorrect'
+  | 'isTyping';
+
+interface LatticeProps {
+  status: StatusValue;
+}
+
+type InputValue = {
+  inputValue: string;
+  status: StatusValue;
 };
+
+type Data = InputValue[][];
+
+const data: Data = [
+  [
+    { inputValue: 'O', status: 'isIncorrect' },
+    { inputValue: 'U', status: 'isCorrect' },
+    { inputValue: 'T', status: 'isIncorrect' },
+    { inputValue: 'E', status: 'isIncorrect' },
+    { inputValue: 'R', status: 'isWrongPosition' },
+  ],
+  [
+    { inputValue: 'A', status: 'isTyping' },
+    { inputValue: 'E', status: 'isTyping' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+  ],
+  [
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+  ],
+  [
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+  ],
+  [
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+  ],
+  [
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+  ],
+];
 
 const App: React.FC = () => {
   return (
@@ -82,48 +137,15 @@ const App: React.FC = () => {
       <GlobalStyle />
       <Title>Wordle</Title>
       <LatticeContainer>
-        <LatticeRow>
-          <Lattice isIncorrect>O</Lattice>
-          <Lattice isCorrect>U</Lattice>
-          <Lattice isIncorrect>T</Lattice>
-          <Lattice isIncorrect>E</Lattice>
-          <Lattice isWrongPosition>R</Lattice>
-        </LatticeRow>
-        <LatticeRow>
-          <Lattice isTyping>A</Lattice>
-          <Lattice isTyping>E</Lattice>
-          <Lattice />
-          <Lattice />
-          <Lattice />
-        </LatticeRow>
-        <LatticeRow>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-        </LatticeRow>
-        <LatticeRow>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-        </LatticeRow>
-        <LatticeRow>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-        </LatticeRow>
-        <LatticeRow>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-          <Lattice></Lattice>
-        </LatticeRow>
+        {data.map((item, index) => (
+          <LatticeRow key={index}>
+            {item.map((arr) => (
+              <>
+                <Lattice status={arr.status}>{arr.inputValue}</Lattice>
+              </>
+            ))}
+          </LatticeRow>
+        ))}
       </LatticeContainer>
     </>
   );
