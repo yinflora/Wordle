@@ -77,25 +77,55 @@ type AppProps = {
 };
 
 const App: React.FC = () => {
-  const lattice = [];
-  for (let i = 0; i < 6; i++) {
-    lattice.push(
-      <LatticeRow>
-        <Lattice />
-        <Lattice isCorrect>P</Lattice>
-        <Lattice isWrongPosition>P</Lattice>
-        <Lattice isIncorrect>P</Lattice>
-        <Lattice isTyping>E</Lattice>
-      </LatticeRow>
-    );
-  }
-
   return (
     <>
       <Normalize />
       <GlobalStyle />
       <Title>Wordle</Title>
-      <LatticeContainer>{lattice}</LatticeContainer>
+      <LatticeContainer>
+        <LatticeRow>
+          <Lattice isIncorrect>O</Lattice>
+          <Lattice isCorrect>U</Lattice>
+          <Lattice isIncorrect>T</Lattice>
+          <Lattice isIncorrect>E</Lattice>
+          <Lattice isWrongPosition>R</Lattice>
+        </LatticeRow>
+        <LatticeRow>
+          <Lattice isTyping>A</Lattice>
+          <Lattice isTyping>E</Lattice>
+          <Lattice />
+          <Lattice />
+          <Lattice />
+        </LatticeRow>
+        <LatticeRow>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+        </LatticeRow>
+        <LatticeRow>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+        </LatticeRow>
+        <LatticeRow>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+        </LatticeRow>
+        <LatticeRow>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+          <Lattice></Lattice>
+        </LatticeRow>
+      </LatticeContainer>
     </>
   );
 };
