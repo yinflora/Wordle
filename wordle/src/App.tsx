@@ -67,11 +67,25 @@ const Lattice = styled.div<LatticeProps>`
     `}
 `;
 
-type LatticeProps = {
-  status: string;
+type StatusValue =
+  | ''
+  | 'isCorrect'
+  | 'isWrongPosition'
+  | 'isIncorrect'
+  | 'isTyping';
+
+interface LatticeProps {
+  status: StatusValue;
+}
+
+type InputValue = {
+  inputValue: string;
+  status: StatusValue;
 };
 
-const data = [
+type Data = InputValue[][];
+
+const data: Data = [
   [
     { inputValue: 'O', status: 'isIncorrect' },
     { inputValue: 'U', status: 'isCorrect' },
