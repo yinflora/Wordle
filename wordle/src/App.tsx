@@ -70,8 +70,7 @@ const Lattice = styled.input<LatticeProps>`
     `}
 `;
 
-const Congratulations = styled.p<CongratulationsProps>`
-  display: ${(props) => (props.win ? 'block' : 'none')};
+const Congratulations = styled.p`
   margin: 20px auto;
   text-align: center;
   font-size: 1.25rem;
@@ -94,10 +93,6 @@ type InputValue = {
 };
 
 type Data = InputValue[][];
-
-type CongratulationsProps = {
-  win: boolean;
-};
 
 const data: Data = [
   [
@@ -265,7 +260,7 @@ const App: React.FC = () => {
           </LatticeRow>
         ))}
       </LatticeContainer>
-      <Congratulations win={correctGuess}>You Win👏</Congratulations>
+      {correctGuess && <Congratulations>You Win👏</Congratulations>}
     </>
   );
 };
