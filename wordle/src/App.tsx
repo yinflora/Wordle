@@ -37,6 +37,7 @@ const Lattice = styled.input<LatticeProps>`
   width: 62px;
   height: 62px;
   border: 2px solid #d3d6da;
+  border-radius: 4px;
   outline: none;
   font-size: 2rem;
   line-height: 62px;
@@ -66,9 +67,14 @@ const Lattice = styled.input<LatticeProps>`
     props.status === 'isTyping' &&
     css`
       border-color: #878a8c;
-    `} /* *:disabled {
-    
-  } */
+    `}
+`;
+
+const Congratulations = styled.p<CongratulationsProps>`
+  display: ${(props) => (props.win ? 'block' : 'none')};
+  margin: 20px auto;
+  text-align: center;
+  font-size: 1.25rem;
 `;
 
 type StatusValue =
@@ -88,6 +94,10 @@ type InputValue = {
 };
 
 type Data = InputValue[][];
+
+type CongratulationsProps = {
+  win: boolean;
+};
 
 const data: Data = [
   [
@@ -134,7 +144,7 @@ const data: Data = [
   ],
 ];
 
-const answer: string[] = ['A', 'P', 'P', 'L', 'E'];
+const answer: string[] = ['F', 'L', 'O', 'R', 'A'];
 
 const App: React.FC = () => {
   const [inputData, setInputData] = useState<Data>(data);
@@ -153,6 +163,7 @@ const App: React.FC = () => {
     false,
     false,
   ]);
+  const [correctGuess, setCorrectGuess] = useState<boolean>(false);
 
   const newData: Data = [...inputData];
 
@@ -174,16 +185,6 @@ const App: React.FC = () => {
     textIndex < 4 && (e.target.nextElementSibling as HTMLInputElement).focus();
   }
 
-  // function handleClearInput(
-  //   e: React.ChangeEvent<HTMLInputElement>,
-  //   rowIndex: number,
-  //   textIndex: number
-  // ) {
-  //   newData[rowIndex][textIndex].inputValue = '';
-  //   newData[rowIndex][textIndex].status = '';
-  //   setInputData(newData);
-  // }
-
   function handleInputStyle(rowIndex: number) {
     currentGuess.forEach(
       (text, index) =>
@@ -197,32 +198,45 @@ const App: React.FC = () => {
     setInputData(newData);
   }
 
-  function handleKeyPress(
+  function handleKeyDown(
     e: React.KeyboardEvent<HTMLInputElement>,
     rowIndex: number,
     textIndex: number
   ) {
+    const previousElement = newData[rowIndex][textIndex - 1];
+    const currentElement = newData[rowIndex][textIndex];
+
     if (e.key === 'Backspace') {
       if (textIndex > 0 && newData[rowIndex][textIndex].status === '') {
-        newData[rowIndex][textIndex - 1].inputValue = '';
-        newData[rowIndex][textIndex - 1].status = '';
-        (e.target.previousElementSibling as HTMLInputElement).focus();
+        previousElement.inputValue = '';
+        previousElement.status = '';
+        (
+          (e.target as HTMLInputElement)
+            .previousElementSibling as HTMLInputElement
+        ).focus();
       } else {
-        newData[rowIndex][textIndex].inputValue = '';
-        newData[rowIndex][textIndex].status = '';
+        currentElement.inputValue = '';
+        currentElement.status = '';
       }
       setInputData(newData);
-    }
-    // else if (textIndex === 4 && e.key === 'Enter') {
-    //   handleInputStyle(rowIndex);
-    // }
-    else if (newData[rowIndex][textIndex].inputValue !== '') {
-      e.key === 'Enter' && handleInputStyle(rowIndex);
-      // setCurrentGuess(['', '', '', '', '']);
+    } else if (e.key === 'Enter' && currentElement.inputValue !== '') {
+      handleInputStyle(rowIndex);
+
+      const correctGuess = currentGuess.every(
+        (text, index) => text === answer[index]
+      );
+      correctGuess && setCorrectGuess(true);
+
       const statusList = [...inputStatus];
       statusList[rowIndex] = true;
       setInputStatus(statusList);
-      e.target.parentNode.nextElementSibling.firstChild.focus();
+
+      (
+        (
+          ((e.target as HTMLInputElement).parentNode as HTMLInputElement)
+            .nextElementSibling as HTMLInputElement
+        ).firstChild as HTMLInputElement
+      ).focus();
     }
   }
 
@@ -241,28 +255,17 @@ const App: React.FC = () => {
                   type="text"
                   maxLength={1}
                   status={arr.status}
-                  // disabled={arr.status !== ''}
-                  disabled={inputStatus[rowIndex]}
+                  disabled={inputStatus[rowIndex] || correctGuess}
                   value={arr.inputValue}
                   onChange={(e) => handleInputChange(e, rowIndex, textIndex)}
-                  // onFocus={(e) => handleClearInput(e, rowIndex, textIndex)}
-                  onKeyDown={
-                    (e) => handleKeyPress(e, rowIndex, textIndex)
-
-                    // (e) =>
-                    //   e.key === 'Backspace' &&
-                    //   console.log('Backspace key pressed ✅')
-
-                    // textIndex === 4 &&
-                    // e.key === 'Enter' &&
-                    // handleInputStyle(rowIndex)
-                  }
+                  onKeyDown={(e) => handleKeyDown(e, rowIndex, textIndex)}
                 />
               </>
             ))}
           </LatticeRow>
         ))}
       </LatticeContainer>
+      <Congratulations win={correctGuess}>You Win👏</Congratulations>
     </>
   );
 };
