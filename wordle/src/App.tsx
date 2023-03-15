@@ -37,6 +37,7 @@ const Lattice = styled.input<LatticeProps>`
   width: 62px;
   height: 62px;
   border: 2px solid #d3d6da;
+  outline: none;
   font-size: 2rem;
   line-height: 62px;
   text-align: center;
@@ -131,25 +132,28 @@ const data: Data = [
   ],
 ];
 
-const answer: string = 'APPLE';
+const answer: string[] = ['A', 'P', 'P', 'L', 'E'];
 
 const App: React.FC = () => {
   const [inputData, setInputData] = useState<Data>(data);
-  const [currentGuess, setCurrentGuess] = useState(['', '', '', '', '']);
+  const [currentGuess, setCurrentGuess] = useState<string[]>([
+    '',
+    '',
+    '',
+    '',
+    '',
+  ]);
 
-  const firstValueArr = Array.from(data);
-  const secondValueArr = Array.from(firstValueArr);
-  console.log(secondValueArr);
+  const newData: Data = [...inputData];
 
   function handleInputChange(
     e: React.ChangeEvent<HTMLInputElement>,
     rowIndex: number,
     textIndex: number
   ) {
-    const value = e.target.value.toUpperCase();
+    const value: string = e.target.value.toUpperCase();
     const ENGLISH_ONLY = /^[A-Za-z]+$/;
-    const newData = [...inputData];
-    let currentGuessData = [...currentGuess];
+    let currentGuessData: string[] = [...currentGuess];
     if (ENGLISH_ONLY.test(value)) {
       newData[rowIndex][textIndex].inputValue = value;
       newData[rowIndex][textIndex].status = 'isTyping';
@@ -160,25 +164,47 @@ const App: React.FC = () => {
     textIndex < 4 && (e.target.nextElementSibling as HTMLInputElement).focus();
   }
 
+  // function handleClearInput(
+  //   e: React.ChangeEvent<HTMLInputElement>,
+  //   rowIndex: number,
+  //   textIndex: number
+  // ) {
+  //   newData[rowIndex][textIndex].inputValue = '';
+  //   newData[rowIndex][textIndex].status = '';
+  //   setInputData(newData);
+  // }
+
   function handleInputStyle(rowIndex: number) {
-    const answerArr = answer.split('');
-    const newData = [...inputData];
     currentGuess.forEach(
       (text, index) =>
-        // (newData[rowIndex][index].status =
-        //   answerArr.indexOf(text) === -1
-        //     ? 'isIncorrect'
-        //     : answerArr.indexOf(text) === index
-        //     ? 'isCorrect'
-        //     : 'isWrongPosition')
         (newData[rowIndex][index].status =
-          answerArr.indexOf(text) === -1
+          answer.indexOf(text) === -1
             ? 'isIncorrect'
-            : answerArr[index] === newData[rowIndex][index].inputValue
+            : answer[index] === newData[rowIndex][index].inputValue
             ? 'isCorrect'
             : 'isWrongPosition')
     );
     setInputData(newData);
+  }
+
+  function handleKeyPress(
+    e: React.KeyboardEvent<HTMLInputElement>,
+    rowIndex: number,
+    textIndex: number
+  ) {
+    if (e.key === 'Backspace') {
+      if (textIndex > 0 && newData[rowIndex][textIndex].status === '') {
+        newData[rowIndex][textIndex - 1].inputValue = '';
+        newData[rowIndex][textIndex - 1].status = '';
+        (e.target.previousElementSibling as HTMLInputElement).focus();
+      } else {
+        newData[rowIndex][textIndex].inputValue = '';
+        newData[rowIndex][textIndex].status = '';
+      }
+      setInputData(newData);
+    } else if (textIndex === 4 && e.key === 'Enter') {
+      handleInputStyle(rowIndex);
+    }
   }
 
   return (
@@ -198,10 +224,17 @@ const App: React.FC = () => {
                   status={arr.status}
                   value={arr.inputValue}
                   onChange={(e) => handleInputChange(e, rowIndex, textIndex)}
-                  onKeyPress={(e) =>
-                    textIndex === 4 &&
-                    e.key === 'Enter' &&
-                    handleInputStyle(rowIndex)
+                  // onFocus={(e) => handleClearInput(e, rowIndex, textIndex)}
+                  onKeyDown={
+                    (e) => handleKeyPress(e, rowIndex, textIndex)
+
+                    // (e) =>
+                    //   e.key === 'Backspace' &&
+                    //   console.log('Backspace key pressed ✅')
+
+                    // textIndex === 4 &&
+                    // e.key === 'Enter' &&
+                    // handleInputStyle(rowIndex)
                   }
                 />
               </>
