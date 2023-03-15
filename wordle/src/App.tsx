@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Normalize } from 'styled-normalize';
 import styled, { createGlobalStyle, css } from 'styled-components';
 
@@ -32,10 +33,12 @@ const LatticeRow = styled.div`
   gap: 5px;
 `;
 
-const Lattice = styled.div<LatticeProps>`
+const Lattice = styled.input<LatticeProps>`
   width: 62px;
   height: 62px;
   border: 2px solid #d3d6da;
+  border-radius: 4px;
+  outline: none;
   font-size: 2rem;
   line-height: 62px;
   text-align: center;
@@ -67,6 +70,12 @@ const Lattice = styled.div<LatticeProps>`
     `}
 `;
 
+const Congratulations = styled.p`
+  margin: 20px auto;
+  text-align: center;
+  font-size: 1.25rem;
+`;
+
 type StatusValue =
   | ''
   | 'isCorrect'
@@ -74,9 +83,9 @@ type StatusValue =
   | 'isIncorrect'
   | 'isTyping';
 
-interface LatticeProps {
+type LatticeProps = {
   status: StatusValue;
-}
+};
 
 type InputValue = {
   inputValue: string;
@@ -87,15 +96,15 @@ type Data = InputValue[][];
 
 const data: Data = [
   [
-    { inputValue: 'O', status: 'isIncorrect' },
-    { inputValue: 'U', status: 'isCorrect' },
-    { inputValue: 'T', status: 'isIncorrect' },
-    { inputValue: 'E', status: 'isIncorrect' },
-    { inputValue: 'R', status: 'isWrongPosition' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
   ],
   [
-    { inputValue: 'A', status: 'isTyping' },
-    { inputValue: 'E', status: 'isTyping' },
+    { inputValue: '', status: '' },
+    { inputValue: '', status: '' },
     { inputValue: '', status: '' },
     { inputValue: '', status: '' },
     { inputValue: '', status: '' },
@@ -130,23 +139,128 @@ const data: Data = [
   ],
 ];
 
+const answer: string[] = ['F', 'L', 'O', 'R', 'A'];
+
 const App: React.FC = () => {
+  const [inputData, setInputData] = useState<Data>(data);
+  const [currentGuess, setCurrentGuess] = useState<string[]>([
+    '',
+    '',
+    '',
+    '',
+    '',
+  ]);
+  const [inputStatus, setInputStatus] = useState<boolean[]>([
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
+  const [correctGuess, setCorrectGuess] = useState<boolean>(false);
+
+  const newData: Data = [...inputData];
+
+  function handleInputChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+    rowIndex: number,
+    textIndex: number
+  ) {
+    const value: string = e.target.value.toUpperCase();
+    const ENGLISH_ONLY = /^[A-Za-z]+$/;
+    let currentGuessData: string[] = [...currentGuess];
+    if (ENGLISH_ONLY.test(value)) {
+      newData[rowIndex][textIndex].inputValue = value;
+      newData[rowIndex][textIndex].status = 'isTyping';
+      setInputData(newData);
+      currentGuessData[textIndex] = value;
+      setCurrentGuess(currentGuessData);
+    }
+    textIndex < 4 && (e.target.nextElementSibling as HTMLInputElement).focus();
+  }
+
+  function handleInputStyle(rowIndex: number) {
+    currentGuess.forEach(
+      (text, index) =>
+        (newData[rowIndex][index].status =
+          answer.indexOf(text) === -1
+            ? 'isIncorrect'
+            : answer[index] === newData[rowIndex][index].inputValue
+            ? 'isCorrect'
+            : 'isWrongPosition')
+    );
+    setInputData(newData);
+  }
+
+  function handleKeyDown(
+    e: React.KeyboardEvent<HTMLInputElement>,
+    rowIndex: number,
+    textIndex: number
+  ) {
+    const previousElement = newData[rowIndex][textIndex - 1];
+    const currentElement = newData[rowIndex][textIndex];
+
+    if (e.key === 'Backspace') {
+      if (textIndex > 0 && newData[rowIndex][textIndex].status === '') {
+        previousElement.inputValue = '';
+        previousElement.status = '';
+        (
+          (e.target as HTMLInputElement)
+            .previousElementSibling as HTMLInputElement
+        ).focus();
+      } else {
+        currentElement.inputValue = '';
+        currentElement.status = '';
+      }
+      setInputData(newData);
+    } else if (e.key === 'Enter' && currentElement.inputValue !== '') {
+      handleInputStyle(rowIndex);
+
+      const correctGuess = currentGuess.every(
+        (text, index) => text === answer[index]
+      );
+      correctGuess && setCorrectGuess(true);
+
+      const statusList = [...inputStatus];
+      statusList[rowIndex] = true;
+      setInputStatus(statusList);
+
+      (
+        (
+          ((e.target as HTMLInputElement).parentNode as HTMLInputElement)
+            .nextElementSibling as HTMLInputElement
+        ).firstChild as HTMLInputElement
+      ).focus();
+    }
+  }
+
   return (
     <>
       <Normalize />
       <GlobalStyle />
       <Title>Wordle</Title>
       <LatticeContainer>
-        {data.map((item, index) => (
-          <LatticeRow key={index}>
-            {item.map((arr) => (
+        {inputData.map((item, rowIndex) => (
+          <LatticeRow key={rowIndex}>
+            {item.map((arr, textIndex) => (
               <>
-                <Lattice status={arr.status}>{arr.inputValue}</Lattice>
+                <Lattice
+                  key={textIndex}
+                  type="text"
+                  maxLength={1}
+                  status={arr.status}
+                  disabled={inputStatus[rowIndex] || correctGuess}
+                  value={arr.inputValue}
+                  onChange={(e) => handleInputChange(e, rowIndex, textIndex)}
+                  onKeyDown={(e) => handleKeyDown(e, rowIndex, textIndex)}
+                />
               </>
             ))}
           </LatticeRow>
         ))}
       </LatticeContainer>
+      {correctGuess && <Congratulations>You Win👏</Congratulations>}
     </>
   );
 };
