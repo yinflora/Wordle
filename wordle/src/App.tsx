@@ -66,7 +66,9 @@ const Lattice = styled.input<LatticeProps>`
     props.status === 'isTyping' &&
     css`
       border-color: #878a8c;
-    `}
+    `} /* *:disabled {
+    
+  } */
 `;
 
 type StatusValue =
@@ -143,6 +145,14 @@ const App: React.FC = () => {
     '',
     '',
   ]);
+  const [inputStatus, setInputStatus] = useState<boolean[]>([
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
 
   const newData: Data = [...inputData];
 
@@ -202,8 +212,17 @@ const App: React.FC = () => {
         newData[rowIndex][textIndex].status = '';
       }
       setInputData(newData);
-    } else if (textIndex === 4 && e.key === 'Enter') {
-      handleInputStyle(rowIndex);
+    }
+    // else if (textIndex === 4 && e.key === 'Enter') {
+    //   handleInputStyle(rowIndex);
+    // }
+    else if (newData[rowIndex][textIndex].inputValue !== '') {
+      e.key === 'Enter' && handleInputStyle(rowIndex);
+      // setCurrentGuess(['', '', '', '', '']);
+      const statusList = [...inputStatus];
+      statusList[rowIndex] = true;
+      setInputStatus(statusList);
+      e.target.parentNode.nextElementSibling.firstChild.focus();
     }
   }
 
@@ -222,6 +241,8 @@ const App: React.FC = () => {
                   type="text"
                   maxLength={1}
                   status={arr.status}
+                  // disabled={arr.status !== ''}
+                  disabled={inputStatus[rowIndex]}
                   value={arr.inputValue}
                   onChange={(e) => handleInputChange(e, rowIndex, textIndex)}
                   // onFocus={(e) => handleClearInput(e, rowIndex, textIndex)}
